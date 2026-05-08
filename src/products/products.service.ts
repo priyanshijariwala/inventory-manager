@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from '../categories/entities/category.entity';
@@ -78,6 +78,16 @@ export class ProductsService {
   }
 
   async update(id: string, dto: UpdateProductDto) {
+
+    const hasData = Object.values(dto).some(
+      value => value !== undefined,
+    );
+
+    if (!hasData) {
+      throw new BadRequestException(
+        'At least one field is required for update',
+      );
+    }
     const product = await this.productsRepo.findOne({ where: { id }, relations: { category: true } });
     if (!product) {
       throw new NotFoundException('Product not found');

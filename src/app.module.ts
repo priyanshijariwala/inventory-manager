@@ -31,12 +31,12 @@ import { StockMovement } from './stock-movements/entities/stock-movement.entity'
     //     synchronize: true,
     //   }),
     // }),
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+      TypeOrmModule.forRoot({
+        type: 'sqlite',
+        database: 'db.sqlite',
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
     AuthModule,
     UsersModule,
     CategoriesModule,

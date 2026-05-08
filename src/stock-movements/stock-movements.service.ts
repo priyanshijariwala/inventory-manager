@@ -20,7 +20,6 @@ export class StockMovementsService {
 
   async adjustStock(dto: AdjustStockDto, user: JwtPayload): Promise<StockMovement> {
     const movement = await this.dataSource.transaction(async (manager) => {
-      // Previous code (always used pessimistic lock; this breaks on SQLite):
       // const product = await manager
       //   .getRepository(Product)
       //   .createQueryBuilder('p')
@@ -32,8 +31,7 @@ export class StockMovementsService {
         .getRepository(Product)
         .createQueryBuilder('p')
         .where('p.id = :id', { id: dto.productId })
-      // SQLite doesn't support pessimistic row locks; only apply locks on DBs that do.
-      if (this.dataSource.options.type !== 'postgres' && this.dataSource.options.type !== 'sqlite') {
+      if (this.dataSource.options.type !== 'sqlite') {
         qb.setLock('pessimistic_write');
       }
 
