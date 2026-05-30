@@ -1,0 +1,224 @@
+<div class="dashboard-container">
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-spinner mode="indeterminate" diameter="54"></mat-progress-spinner>
+    <p>Preparing inventory intelligence...</p>
+  </div>
+
+  <div *ngIf="!loading" class="dashboard-content">
+    <section class="hero-panel">
+      <div>
+        <span class="eyebrow">Operations command</span>
+        <h1>Inventory Dashboard</h1>
+        <p>Live stock visibility, product health, and movement activity for your warehouse.</p>
+      </div>
+      <div class="date-chip">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ today | date:'EEE, MMM d, y' }}</span>
+      </div>
+    </section>
+
+    <section class="metrics-grid">
+      <article class="metric-card primary">
+        <div class="metric-top">
+          <span>Inventory Value</span>
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <strong>{{ report?.totalInventoryValue | centsCurrency }}</strong>
+        <div class="metric-footer positive">
+          <mat-icon>trending_up</mat-icon>
+          <span>Total assets tracked</span>
+        </div>
+        <div class="mini-bars" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </article>
+
+      <article class="metric-card">
+        <div class="metric-top">
+          <span>Total Products</span>
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <strong>{{ totalProducts }}</strong>
+        <div class="metric-footer">
+          <mat-icon>layers</mat-icon>
+          <span>SKUs in catalog</span>
+        </div>
+      </article>
+
+      <article class="metric-card ring-card">
+        <div class="metric-top">
+          <span>Catalog Health</span>
+          <mat-icon>donut_large</mat-icon>
+        </div>
+        <div class="ring-wrap">
+          <div class="ring">
+            <strong>{{ totalProducts ? ((totalProducts - lowStockProducts.length) / totalProducts * 100 | number:'1.0-0') : 100 }}%</strong>
+          </div>
+          <div class="ring-legend">
+            <span><i class="good"></i>Healthy</span>
+            <span><i class="warn"></i>Low stock</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="metric-card weather-card">
+        <div class="metric-top">
+          <span>Team Capacity</span>
+          <mat-icon>groups</mat-icon>
+        </div>
+        <strong>{{ totalUsers }}</strong>
+        <div class="metric-footer">
+          <mat-icon>category</mat-icon>
+          <span>{{ totalCategories }} categories managed</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="workspace-grid">
+      <mat-card class="panel low-stock-card">
+        <mat-card-header>
+          <div class="panel-heading">
+            <div>
+              <mat-card-title>Critical Stock</mat-card-title>
+              <mat-card-subtitle>Products that need replenishment</mat-card-subtitle>
+            </div>
+            <span class="count-pill">{{ lowStockProducts.length }} items</span>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <ng-container *ngIf="lowStockProducts.length > 0; else noLowStock">
+            <div class="stock-list">
+              <div class="stock-row" *ngFor="let product of lowStockProducts; trackBy: trackByProductId">
+                <div class="avatar danger">
+                  <mat-icon>inventory</mat-icon>
+                </div>
+                <div class="stock-info">
+                  <strong>{{ product.name }}</strong>
+                  <span>{{ product.sku }}</span>
+                  <div class="stock-track">
+                    <div [style.width.%]="getStockPercentage(product)" [class.empty]="isCriticalStock(product)"></div>
+                  </div>
+                </div>
+                <div class="stock-count" [class.empty]="isCriticalStock(product)">
+                  {{ product.stock || 0 }}
+                  <small>/ {{ product.lowStockThreshold || 5 }}</small>
+                </div>
+              </div>
+            </div>
+            <button mat-button routerLink="/stock-movements" class="panel-action">
+              <mat-icon>add_shopping_cart</mat-icon>
+              Restock Items
+            </button>
+          </ng-container>
+          <ng-template #noLowStock>
+            <div class="empty-state success">
+              <mat-icon>verified</mat-icon>
+              <strong>All stock levels are healthy</strong>
+              <span>No items are currently under threshold.</span>
+            </div>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="panel chart-panel">
+        <mat-card-header>
+          <div class="panel-heading">
+            <div>
+              <mat-card-title>Stock Movement</mat-card-title>
+              <mat-card-subtitle>Recent operating rhythm</mat-card-subtitle>
+            </div>
+            <button mat-button routerLink="/reports">Reports</button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="line-chart" aria-hidden="true">
+            <svg viewBox="0 0 560 220" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#0ea5ff" stop-opacity="0.36"></stop>
+                  <stop offset="100%" stop-color="#0ea5ff" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
+              <path class="grid" d="M0 40H560M0 90H560M0 140H560M0 190H560"></path>
+              <path class="area" d="M0 170 C45 125 68 145 105 110 S170 148 205 102 S278 135 310 62 S385 88 410 118 S455 210 498 172 S535 156 560 118 L560 220 L0 220 Z"></path>
+              <path class="line" d="M0 170 C45 125 68 145 105 110 S170 148 205 102 S278 135 310 62 S385 88 410 118 S455 210 498 172 S535 156 560 118"></path>
+            </svg>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="panel activity-card">
+        <mat-card-header>
+          <div class="panel-heading">
+            <div>
+              <mat-card-title>Recent Activity</mat-card-title>
+              <mat-card-subtitle>Latest stock movement events</mat-card-subtitle>
+            </div>
+            <button mat-button routerLink="/stock-movements">View All</button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <ng-container *ngIf="recentMovements.length > 0; else noMovements">
+            <div class="activity-list">
+              <div class="activity-row" *ngFor="let movement of recentMovements; trackBy: trackByMovementId">
+                <span class="activity-dot" [style.background]="getMovementTypeColor(movement.type)"></span>
+                <div>
+                  <strong>{{ movement.product?.name || 'Unknown Product' }}</strong>
+                  <span>{{ movement.type | titlecase }} · {{ movement.createdAt | relativeTime }}</span>
+                </div>
+                <b [class.positive]="movement.quantity > 0" [class.negative]="movement.quantity < 0">
+                  {{ movement.quantity > 0 ? '+' : ''}}{{ movement.quantity }}
+                </b>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noMovements>
+            <div class="empty-state">
+              <mat-icon>timeline</mat-icon>
+              <strong>No activity yet</strong>
+              <span>Stock updates will appear here.</span>
+            </div>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="panel products-panel">
+        <mat-card-header>
+          <div class="panel-heading">
+            <div>
+              <mat-card-title>Best Selling Products</mat-card-title>
+              <mat-card-subtitle>Newest products in inventory</mat-card-subtitle>
+            </div>
+            <button mat-button routerLink="/products">View All</button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <ng-container *ngIf="recentProducts.length > 0; else noRecentProducts">
+            <div class="product-table">
+              <div class="product-row" *ngFor="let product of recentProducts; trackBy: trackByProductId">
+                <div class="avatar">
+                  <mat-icon>{{ getStockIcon(product) }}</mat-icon>
+                </div>
+                <div>
+                  <strong>{{ product.name }}</strong>
+                  <span>{{ product.sku }}</span>
+                </div>
+                <span class="price">{{ product.price ? (product.price | currency) : '$0.00' }}</span>
+                <span class="status" [class.low]="isLowStock(product)" [class.out]="isOutOfStock(product)">
+                  {{ getStockLabel(product) }}
+                </span>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noRecentProducts>
+            <div class="empty-state">
+              <mat-icon>inventory_2</mat-icon>
+              <strong>No products yet</strong>
+              <span>Add products to build your catalog.</span>
+            </div>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </div>
+</div>

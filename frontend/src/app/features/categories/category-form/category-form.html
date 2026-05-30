@@ -1,0 +1,40 @@
+<div class="dialog-form-container">
+  <div class="dialog-header">
+    <div>
+      <h2>{{ isEditMode ? 'Edit Category' : 'Add New Category' }}</h2>
+      <p class="dialog-subtitle">
+        {{ isEditMode ? 'Update the category details below and save changes.' : 'Keep your category library organized and descriptive.' }}
+      </p>
+    </div>
+    <button mat-icon-button aria-label="Close dialog" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="form" class="category-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Category Name</mat-label>
+        <input matInput appAutoFocus formControlName="name" placeholder="Enter category name" />
+        <mat-error *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+          Name is required and must be at least 3 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width description-field">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" placeholder="Enter category description" rows="4"></textarea>
+        <mat-error *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
+          Description is required
+        </mat-error>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button color="inherit" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" [disabled]="form.invalid || loading" (click)="onSubmit()">
+      {{ isEditMode ? 'Update category' : 'Create category' }}
+    </button>
+  </mat-dialog-actions>
+</div>

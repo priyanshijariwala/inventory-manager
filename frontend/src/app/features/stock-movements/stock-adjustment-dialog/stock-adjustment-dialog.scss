@@ -1,0 +1,138 @@
+.stock-adjustment-dialog {
+  min-width: 450px;
+  max-width: 90vw;
+  background: #0d2136;
+  color: #d9e7f7;
+
+  .dialog-header {
+    text-align: center;
+    margin-bottom: 1rem;
+
+    .dialog-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      margin: 0.5rem 0;
+      font-size: 1.35rem;
+      color: #f4f9ff;
+    }
+
+    .product-info {
+      margin: 0;
+      color: #8fa8c1;
+      font-size: 0.86rem;
+
+      strong {
+        color: #f4f9ff;
+      }
+
+      .sku {
+        color: #718aa3;
+        margin-left: 0.25rem;
+      }
+
+      .current-stock {
+        display: block;
+        margin-top: 0.25rem;
+        font-weight: 500;
+        color: #0ea5ff;
+      }
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+
+  .type-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .preview {
+    background: rgba(7, 18, 32, 0.58);
+    border: 1px solid rgba(83, 132, 170, 0.16);
+    border-radius: 8px;
+    padding: 0.85rem;
+    margin-top: 0.85rem;
+
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(83, 132, 170, 0.16);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.highlight {
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding-top: 0.75rem;
+      }
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    min-height: auto;
+    margin-top: 1.25rem;
+    padding: 0 1.25rem 1.25rem;
+
+    button {
+      margin: 0;
+    }
+  }
+
+  .confirm-button {
+    min-width: 200px;
+
+    .button-content {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      line-height: 1;
+    }
+
+    mat-icon,
+    mat-spinner {
+      flex: 0 0 auto;
+      margin: 0;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+:host ::ng-deep .stock-adjustment-dialog .mat-mdc-dialog-actions.dialog-actions {
+  margin-top: 1.25rem !important;
+  padding: 0 1.25rem 1.25rem !important;
+}
+
+@media (max-width: 600px) {
+  .stock-adjustment-dialog {
+    min-width: auto;
+    max-width: 95vw;
+  }
+}

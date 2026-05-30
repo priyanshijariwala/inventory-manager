@@ -1,0 +1,51 @@
+<div class="dialog-form-container">
+  <div class="dialog-header">
+    <div>
+      <h2>{{ data.user?.id ? 'Edit User' : 'Add New User' }}</h2>
+      <p class="dialog-subtitle">Add new team members with role access and secure details.</p>
+    </div>
+    <button mat-icon-button aria-label="Close dialog" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="form" class="user-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput appAutoFocus type="email" formControlName="email" placeholder="user@example.com" />
+        <mat-error *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          Please enter a valid email
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Role</mat-label>
+          <mat-select formControlName="role">
+            <mat-option value="staff">Staff</mat-option>
+            <mat-option value="manager">Manager</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <ng-container *ngIf="!data.user?.id">
+          <mat-form-field appearance="outline" class="flex-1">
+            
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Enter a password" />
+            <mat-error *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+              Password is required and must be at least 6 characters
+            </mat-error>
+          </mat-form-field>
+        </ng-container>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button color="inherit" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" [disabled]="form.invalid || loading" (click)="onSubmit()">
+      {{ data.user?.id ? 'Update user' : 'Create user' }}
+    </button>
+  </mat-dialog-actions>
+</div>

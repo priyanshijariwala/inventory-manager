@@ -1,0 +1,107 @@
+:host ::ng-deep .mat-dialog-container {
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .mat-dialog-content {
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+:host ::ng-deep .mat-dialog-actions {
+  padding: 0 1.25rem 1.25rem !important;
+}
+
+.dialog-form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  background: #0d2136;
+  box-sizing: border-box;
+  color: #d9e7f7;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  color: #f4f9ff;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.dialog-subtitle {
+  margin: 0.25rem 0 0;
+  color: #8fa8c1;
+  font-size: 0.86rem;
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:host ::ng-deep .product-form .description-field {
+  .mat-mdc-text-field-wrapper {
+    height: auto !important;
+    min-height: 112px !important;
+    align-items: flex-start !important;
+  }
+
+  .mat-mdc-form-field-flex {
+    height: auto !important;
+    min-height: 112px !important;
+    align-items: flex-start !important;
+  }
+
+  .mat-mdc-form-field-infix {
+    min-height: 92px !important;
+    padding-top: 18px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .mdc-floating-label {
+    top: 24px !important;
+  }
+
+  .mdc-floating-label--float-above {
+    transform: translateY(-30px) scale(0.75) !important;
+  }
+
+  textarea.mat-mdc-input-element {
+    min-height: 72px;
+    line-height: 1.45;
+    resize: vertical;
+  }
+}
+
+.dialog-actions {
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(83, 132, 170, 0.16);
+  gap: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

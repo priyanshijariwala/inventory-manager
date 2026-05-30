@@ -1,0 +1,17 @@
+<div class="cinformation-container">
+  <div class="cinformation-header">
+    <h2>{{ data.title }}</h2>
+    <button mat-icon-button aria-label="Close" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="cinformation-body">
+    <p>{{ data.message }}</p>
+  </div>
+
+  <div class="cinformation-actions">
+    <button mat-stroked-button color="inherit" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="warn" (click)="confirm()">Confirm</button>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<mat-toolbar class="app-toolbar" color="primary">
+  <button mat-icon-button (click)="sidenav.toggle()" class="hamburger">
+    <mat-icon class="mymenu">menu</mat-icon>
+  </button>
+  <span class="brand-mark">I</span>
+  <span class="app-title">Inventory Manager</span>
+  <span class="spacer"></span>
+  <div class="user-section">
+    <button mat-icon-button matTooltip="Notifications">
+      <mat-icon class="mymenu">notifications</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" [matTooltip]="userName">
+      <mat-icon class="mymenu">account_circle</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <div class="user-menu-header">
+        <strong>{{ userName }}</strong>
+        <span *ngIf="userRole">{{ userRole | titlecase }}</span>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>
+
+<mat-sidenav-container autosize class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" [opened]="isDrawerOpen$ | async" [fixedInViewport]="!(isScreenLarge$ | async)" class="sidenav">
+    <div class="sidebar-kicker">Main</div>
+    <mat-nav-list class="nav-list">
+      <a mat-list-item routerLinkActive="active" [routerLink]="['/dashboard']" (click)="closeSidenavOnMobile()">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      <a mat-list-item routerLinkActive="active" [routerLink]="['/products']" (click)="closeSidenavOnMobile()">
+        <mat-icon matListItemIcon>inventory_2</mat-icon>
+        <span matListItemTitle>Products</span>
+      </a>
+      <a mat-list-item routerLinkActive="active" [routerLink]="['/categories']" (click)="closeSidenavOnMobile()">
+        <mat-icon matListItemIcon>category</mat-icon>
+        <span matListItemTitle>Categories</span>
+      </a>
+      <a mat-list-item routerLinkActive="active" [routerLink]="['/stock-movements']" (click)="closeSidenavOnMobile()">
+        <mat-icon matListItemIcon>swap_horiz</mat-icon>
+        <span matListItemTitle>Stock Movements</span>
+      </a>
+      <a mat-list-item routerLinkActive="active" [routerLink]="['/reports']" (click)="closeSidenavOnMobile()">
+        <mat-icon matListItemIcon>assessment</mat-icon>
+        <span matListItemTitle>Reports</span>
+      </a>
+      <mat-divider></mat-divider>
+      <a mat-list-item routerLinkActive="active" [routerLink]="['/users']" (click)="closeSidenavOnMobile()">
+        <mat-icon matListItemIcon>people</mat-icon>
+        <span matListItemTitle>Users</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

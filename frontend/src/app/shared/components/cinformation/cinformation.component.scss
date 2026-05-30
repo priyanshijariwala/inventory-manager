@@ -1,0 +1,42 @@
+.cinformation-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #0d2136;
+  box-sizing: border-box;
+  color: #d9e7f7;
+}
+
+.cinformation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cinformation-header h2 {
+  margin: 0;
+  color: #f4f9ff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.cinformation-header button {
+  color: #d9e7f7;
+}
+
+.cinformation-body {
+  p {
+    margin: 0;
+    color: #b7c8dc;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
+.cinformation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

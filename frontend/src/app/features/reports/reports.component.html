@@ -1,0 +1,149 @@
+<div class="reports-container">
+  <section class="report-hero">
+    <div>
+      <span class="eyebrow">Inventory intelligence</span>
+      <h1>
+        <mat-icon>assessment</mat-icon>
+        Stock Reports
+      </h1>
+      <p>Analyze inventory value, movement volume, and operational activity.</p>
+    </div>
+
+    <div class="report-actions">
+      <button mat-button (click)="loadReport()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </section>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="applyFilters()" [disabled]="loading">
+            <mat-icon>filter_list</mat-icon>
+            Apply
+          </button>
+          <button mat-button color="warn" (click)="clearFilters()" [disabled]="loading">
+            <mat-icon>clear</mat-icon>
+            Clear
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p>Loading report data...</p>
+  </div>
+
+  <div *ngIf="!loading && report" class="report-content">
+    <section class="summary-grid">
+      <article class="summary-card">
+        <div class="summary-icon green">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <span>Total Products</span>
+        <strong>{{ formatNumber(report.totalProducts) }}</strong>
+        <small>Catalog coverage</small>
+      </article>
+
+      <article class="summary-card primary">
+        <div class="summary-icon blue">
+          <mat-icon>attach_money</mat-icon>
+        </div>
+        <span>Inventory Value</span>
+        <strong>{{ report.totalInventoryValue | centsCurrency }}</strong>
+        <small>Total asset value</small>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon amber">
+          <mat-icon>swap_horiz</mat-icon>
+        </div>
+        <span>Total Movements</span>
+        <strong>{{ formatNumber(getTotalMovements()) }}</strong>
+        <small>Transactions tracked</small>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon violet">
+          <mat-icon>calendar_today</mat-icon>
+        </div>
+        <span>Report Period</span>
+        <strong>{{ getReportStartDate() }}</strong>
+        <small>{{ getReportEndDate() }}</small>
+      </article>
+    </section>
+
+    <section class="analytics-grid">
+      <mat-card class="panel chart-panel">
+        <mat-card-header>
+          <mat-card-title>Movement Trend</mat-card-title>
+          <mat-card-subtitle>Report activity distribution</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="line-chart" aria-hidden="true">
+            <svg viewBox="0 0 560 220" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="reportChartFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#0ea5ff" stop-opacity="0.34"></stop>
+                  <stop offset="100%" stop-color="#0ea5ff" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
+              <path class="grid" d="M0 40H560M0 90H560M0 140H560M0 190H560"></path>
+              <path class="area" d="M0 168 C54 118 82 154 128 108 S211 140 251 74 S335 92 378 126 S456 198 512 132 S540 118 560 96 L560 220 L0 220 Z"></path>
+              <path class="line" d="M0 168 C54 118 82 154 128 108 S211 140 251 74 S335 92 378 126 S456 198 512 132 S540 118 560 96"></path>
+            </svg>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="panel movement-panel">
+        <mat-card-header>
+          <mat-card-title>Movement Breakdown</mat-card-title>
+          <mat-card-subtitle>Transactions and units by type</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="movement-list">
+            <div class="movement-item" *ngFor="let stat of getMovementStats()">
+              <div class="movement-label">
+                <span class="movement-color" [style.background]="stat.color"></span>
+                <strong>{{ stat.label }}</strong>
+              </div>
+              <div class="movement-meter">
+                <i [style.background]="stat.color" [style.width.%]="getTotalMovements() ? (stat.count / getTotalMovements()) * 100 : 0"></i>
+              </div>
+              <div class="movement-values">
+                <span>{{ formatNumber(stat.count) }} transactions</span>
+                <b>{{ formatNumber(stat.totalQuantity) }} units</b>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </div>
+
+  <div *ngIf="!loading && !report" class="no-data">
+    <mat-icon>report_off</mat-icon>
+    <strong>No report data available</strong>
+    <span>Try changing filters or refreshing the report.</span>
+  </div>
+</div>

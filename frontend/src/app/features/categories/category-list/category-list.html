@@ -1,0 +1,19 @@
+<div class="categories-container">
+  <div class="header">
+    <h1>Categories</h1>
+    <button mat-raised-button color="primary" (click)="openAddCategory()">
+      <mat-icon>add</mat-icon>
+      Add Category
+    </button>
+  </div>
+
+  <div class="ag-theme-material" style="width: 100%;">
+    <ag-grid-angular
+      [gridOptions]="gridOptions"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [datasource]="rowDataSource"
+      (gridReady)="onGridReady($event)"
+    ></ag-grid-angular>
+  </div>
+</div>

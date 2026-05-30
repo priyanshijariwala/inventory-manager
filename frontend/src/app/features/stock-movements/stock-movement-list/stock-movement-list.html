@@ -1,0 +1,82 @@
+<div class="stock-movements-container">
+  <div class="header">
+    <h1>Stock Movements</h1>
+    <div class="header-actions">
+      <a mat-raised-button color="accent" routerLink="/products">
+        <mat-icon>add_shopping_cart</mat-icon>
+        Adjust Stock
+      </a>
+    </div>
+  </div>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Product</mat-label>
+          <mat-select [(ngModel)]="selectedProduct" (selectionChange)="onFilterChange()">
+            <mat-option disabled>
+              <input
+                matInput
+                [(ngModel)]="productSearchText"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Search products"
+                (click)="$event.stopPropagation()"
+                (keydown)="$event.stopPropagation()"
+              />
+            </mat-option>
+            <mat-option value="">All Products</mat-option>
+            <mat-option *ngFor="let product of products | search:productSearchText:['name', 'sku']; trackBy: trackByProductId" [value]="product.id">
+              {{ product.name }} ({{ product.sku }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Movement Type</mat-label>
+          <mat-select [(ngModel)]="selectedType" (selectionChange)="onFilterChange()">
+            <mat-option value="">All Types</mat-option>
+            <mat-option value="restock">Restock</mat-option>
+            <mat-option value="sale">Sale</mat-option>
+            <mat-option value="adjustment">Adjustment</mat-option>
+            <mat-option value="return">Return</mat-option>
+            <mat-option value="damage">Damage</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate" (dateChange)="onFilterChange()">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" (dateChange)="onFilterChange()">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="filter-actions">
+          <button mat-button color="warn" (click)="clearFilters()">
+            <mat-icon>clear</mat-icon>
+            Clear
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="grid-container">
+    <div class="ag-theme-material" style="width: 100%;">
+      <ag-grid-angular
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [datasource]="rowDataSource"
+        (gridReady)="onGridReady($event)"
+      ></ag-grid-angular>
+    </div>
+  </div>
+</div>

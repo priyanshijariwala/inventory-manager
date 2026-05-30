@@ -8,6 +8,11 @@ export class ListProductsQueryDto {
   @IsString()
   q?: string;
 
+  @ApiHideProperty()
+  @IsOptional()
+  @IsString()
+  search?: string;
+
   @ApiPropertyOptional({  })
   @IsOptional()
   @IsUUID()

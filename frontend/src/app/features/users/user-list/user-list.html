@@ -1,0 +1,19 @@
+<div class="users-container">
+  <div class="header">
+    <h1>Users</h1>
+    <button mat-raised-button color="primary" (click)="openAddUser()">
+      <mat-icon>add</mat-icon>
+      Add User
+    </button>
+  </div>
+
+  <div class="ag-theme-material" style="height: 600px; width: 100%;">
+    <ag-grid-angular
+      [gridOptions]="gridOptions"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [datasource]="rowDataSource"
+      (gridReady)="onGridReady($event)"
+    ></ag-grid-angular>
+  </div>
+</div>

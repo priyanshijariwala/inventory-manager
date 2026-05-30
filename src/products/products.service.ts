@@ -20,6 +20,7 @@ export class ProductsService {
     const page = query.page ?? 1;
     const limitRaw = query.perPage ?? query.limit ?? 10;
     const limit = Math.min(limitRaw, 100);
+    const search = (query.q ?? query.search)?.trim();
 
     const qb = this.productsRepo
       .createQueryBuilder('product')
@@ -28,8 +29,10 @@ export class ProductsService {
       .skip((page - 1) * limit)
       .take(limit);
 
-    if (query.q) {
-      qb.andWhere('(product.name ILIKE :q OR product.sku ILIKE :q)', { q: `%${query.q}%` });
+    if (search) {
+      qb.andWhere('(LOWER(product.name) LIKE :q OR LOWER(product.sku) LIKE :q)', {
+        q: `%${search.toLowerCase()}%`,
+      });
     }
     if (query.categoryId) {
       qb.andWhere('category.id = :categoryId', { categoryId: query.categoryId });

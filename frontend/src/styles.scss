@@ -1,0 +1,613 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+@use '@angular/material' as mat;
+@use 'ngx-toastr/toastr';
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: -3,
+    )
+  );
+}
+
+body {
+  color-scheme: dark;
+  background-color: #08111d;
+  color: #d9e7f7;
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+  font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// AG Grid height fixes
+[class*="ag-theme-"] {
+  height: min(62vh, 620px);
+  min-height: 360px;
+  --ag-background-color: #0d2136;
+  --ag-header-background-color: #0a2942;
+  --ag-header-foreground-color: #c8e5ff;
+  --ag-foreground-color: #d9e7f7;
+  --ag-border-color: rgba(83, 132, 170, 0.28);
+  --ag-row-border-color: rgba(83, 132, 170, 0.14);
+  --ag-odd-row-background-color: #0d2136;
+  --ag-row-hover-color: rgba(14, 165, 255, 0.08);
+  --ag-selected-row-background-color: rgba(14, 165, 255, 0.16);
+  --ag-header-height: 56px;
+  --ag-row-height: 52px;
+}
+
+[class*="ag-theme-"] ag-grid-angular {
+  display: block;
+  height: 100%;
+  min-height: inherit;
+}
+
+[class*="ag-theme-"] .ag-root-wrapper {
+  height: 100% !important;
+  position: relative;
+  padding-bottom: 54px;
+}
+
+[class*="ag-theme-"] .ag-root-wrapper-body.ag-layout-normal {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+[class*="ag-theme-"] .ag-root {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+[class*="ag-theme-"] .ag-body {
+  min-height: 0 !important;
+}
+
+[class*="ag-theme-"] .ag-header {
+  position: relative;
+  z-index: 5;
+  display: flex !important;
+  min-height: var(--ag-header-height) !important;
+  height: var(--ag-header-height) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  border-bottom: 1px solid rgba(184, 218, 245, 0.5);
+  box-shadow: 0 8px 18px rgba(3, 10, 18, 0.18);
+}
+
+[class*="ag-theme-"] .ag-header-row,
+[class*="ag-theme-"] .ag-header-viewport,
+[class*="ag-theme-"] .ag-header-container {
+  min-height: var(--ag-header-height) !important;
+}
+
+[class*="ag-theme-"] .ag-header-cell-label {
+  color: #c8e5ff;
+  font-weight: 700;
+}
+
+[class*="ag-theme-"] .ag-overlay {
+  pointer-events: none;
+}
+
+[class*="ag-theme-"] .ag-overlay-no-rows-wrapper {
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  background:
+    linear-gradient(180deg, rgba(13, 33, 54, 0.96), rgba(8, 17, 29, 0.72)),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 51px,
+      rgba(83, 132, 170, 0.12) 52px
+    );
+}
+
+[class*="ag-theme-"] .ag-overlay-no-rows-center {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  min-height: 44px;
+  padding: 0 1.2rem;
+  border: 1px solid rgba(83, 132, 170, 0.24);
+  border-radius: 8px;
+  background: rgba(8, 17, 29, 0.78);
+  color: #b9d5ee;
+  font-weight: 700;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+[class*="ag-theme-"] .ag-paging-panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 54px;
+  border-top: 1px solid rgba(83, 132, 170, 0.2);
+  background: #091a2c;
+  color: #d9e7f7;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #071524;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #26445f;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #35617f;
+}
+
+// Status badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  height: 26px;
+  padding: 0.25rem 0.75rem;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-active {
+  background-color: rgba(34, 197, 94, 0.14);
+  color: #4ade80;
+}
+
+.status-inactive {
+  background-color: rgba(239, 68, 68, 0.14);
+  color: #fb7185;
+}
+
+// Action buttons in grids
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(14, 165, 255, 0.1);
+  }
+}
+
+.action-btn.delete-btn {
+  color: #d32f2f;
+}
+
+.grid-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  flex-wrap: nowrap;
+}
+
+.grid-action-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(83, 132, 170, 0.18);
+  border-radius: 7px;
+  background: rgba(7, 18, 32, 0.48);
+  color: #9fdcff;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+
+  span {
+    font-family: 'Material Icons';
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  &:hover {
+    background: rgba(14, 165, 255, 0.14);
+    border-color: rgba(14, 165, 255, 0.42);
+    color: #dff3ff;
+  }
+
+  &.adjust {
+    color: #fbbf24;
+  }
+
+  &.edit {
+    color: #38bdf8;
+  }
+
+  &.delete {
+    color: #fb7185;
+  }
+}
+
+// Form field improvements
+mat-form-field {
+  width: 100%;
+}
+
+// Card improvements
+mat-card {
+  border-radius: 8px;
+  background: #0d2136;
+  color: #d9e7f7;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.28);
+  }
+}
+
+// Button improvements
+.mat-mdc-raised-button {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+// Toast notifications
+.cdk-global-overlay-wrapper {
+  .mat-mdc-snack-bar-action {
+    color: white;
+    font-weight: 500;
+  }
+}
+
+// Dialog improvements
+.cdk-overlay-pane {
+  .mat-mdc-dialog-container {
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.mat-mdc-menu-panel,
+.mat-mdc-dialog-surface,
+.mat-mdc-select-panel,
+.mat-datepicker-content {
+  background: #0d2136 !important;
+  color: #d9e7f7 !important;
+  border: 1px solid rgba(83, 132, 170, 0.18);
+}
+
+.mat-mdc-menu-item,
+.mat-mdc-option {
+  color: #d9e7f7 !important;
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-container-color: #0b1d31;
+  --mdc-outlined-text-field-input-text-color: #e8f2ff;
+  --mdc-outlined-text-field-label-text-color: #8fa8c1;
+  --mdc-outlined-text-field-outline-color: rgba(83, 132, 170, 0.35);
+  --mdc-outlined-text-field-hover-outline-color: rgba(14, 165, 255, 0.56);
+  --mdc-outlined-text-field-focus-outline-color: #0ea5ff;
+  --mat-form-field-container-height: 42px;
+  --mat-form-field-container-vertical-padding: 9px;
+  font-size: 0.9rem;
+}
+
+.mat-mdc-text-field-wrapper {
+  height: 42px !important;
+  border-radius: 8px !important;
+  background: #0b1d31 !important;
+}
+
+.mat-mdc-form-field-flex {
+  height: 42px;
+  align-items: center !important;
+}
+
+.mat-mdc-form-field-infix {
+  min-height: 42px !important;
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+}
+
+.mat-mdc-form-field-icon-prefix,
+.mat-mdc-form-field-icon-suffix {
+  align-self: center;
+  padding-top: 0 !important;
+}
+
+.mat-mdc-form-field .mdc-floating-label {
+  top: 21px !important;
+}
+
+.mat-mdc-form-field .mdc-floating-label--float-above {
+  transform: translateY(-27px) scale(0.75) !important;
+}
+
+.mat-mdc-input-element,
+.mat-mdc-select-value {
+  color: #e8f2ff !important;
+  font-size: 0.9rem !important;
+}
+
+.mat-mdc-select-arrow,
+.mat-datepicker-toggle,
+.mat-mdc-form-field-icon-prefix mat-icon,
+.mat-mdc-form-field-icon-suffix mat-icon {
+  color: #b7c8dc !important;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button {
+  min-height: 38px !important;
+  height: 38px;
+  border-radius: 999px !important;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+[class*="ag-theme-"] {
+  --ag-background-color: #0d2136;
+  --ag-data-color: #e7f1fc;
+  --ag-header-background-color: #071524;
+  --ag-odd-row-background-color: #0a1a2d;
+  --ag-row-hover-color: rgba(14, 165, 255, 0.13);
+  --ag-border-color: rgba(83, 132, 170, 0.18);
+  --ag-foreground-color: #d9e7f7;
+  --ag-secondary-foreground-color: #8fa8c1;
+  --ag-header-foreground-color: #a9bed3;
+  --ag-control-panel-background-color: #071524;
+  --ag-modal-overlay-background-color: rgba(8, 17, 29, 0.72);
+  --ag-selected-row-background-color: rgba(14, 165, 255, 0.14);
+  --ag-input-background-color: #0b1d31;
+  --ag-input-text-color: #e8f2ff;
+  --ag-wrapper-border-radius: 8px;
+  --ag-row-height: 48px;
+  --ag-header-height: 54px;
+  --ag-list-item-height: 34px;
+  color: #d9e7f7;
+}
+
+.ag-theme-material {
+  --ag-material-primary-color: #0ea5ff;
+  --ag-material-accent-color: #22d3ee;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #0d2136 !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+}
+
+.ag-theme-material .ag-root-wrapper,
+.ag-theme-material .ag-root,
+.ag-theme-material .ag-root-wrapper-body,
+.ag-theme-material .ag-layout-normal,
+.ag-theme-material .ag-body,
+.ag-theme-material .ag-body-clipper,
+.ag-theme-material .ag-body-viewport,
+.ag-theme-material .ag-center-cols-clipper,
+.ag-theme-material .ag-center-cols-viewport,
+.ag-theme-material .ag-full-width-container,
+.ag-theme-material .ag-floating-top,
+.ag-theme-material .ag-floating-bottom,
+.ag-theme-material .ag-body-horizontal-scroll,
+.ag-theme-material .ag-body-horizontal-scroll-viewport,
+.ag-theme-material .ag-body-horizontal-scroll-container,
+.ag-theme-material .ag-body-vertical-scroll,
+.ag-theme-material .ag-body-vertical-scroll-viewport,
+.ag-theme-material .ag-header,
+.ag-theme-material .ag-header-cell,
+.ag-theme-material .ag-paging-panel,
+.ag-theme-material .ag-row {
+  background-color: #0d2136 !important;
+  color: #d9e7f7 !important;
+}
+
+.ag-theme-material .ag-center-cols-container {
+  background: transparent !important;
+  color: #d9e7f7 !important;
+}
+
+.ag-theme-material .ag-header,
+.ag-theme-material .ag-paging-panel {
+  background-color: #071524 !important;
+}
+
+.ag-theme-material .ag-header-cell-text {
+  color: #a9bed3 !important;
+  font-weight: 800;
+}
+
+.ag-theme-material .ag-row {
+  border-color: rgba(83, 132, 170, 0.14) !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 2;
+}
+
+.ag-theme-material .ag-row-even {
+  background-color: #0d2136 !important;
+}
+
+.ag-theme-material .ag-row-odd {
+  background-color: #0a1f33 !important;
+}
+
+.ag-theme-material .ag-row::before,
+.ag-theme-material .ag-row::after,
+.ag-theme-material .ag-row-hover::before,
+.ag-theme-material .ag-row-hover::after,
+.ag-theme-material .ag-row-selected::before,
+.ag-theme-material .ag-row-selected::after {
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+.ag-theme-material .ag-row-hover,
+.ag-theme-material .ag-row-hover.ag-row-even,
+.ag-theme-material .ag-row-hover.ag-row-odd,
+.ag-theme-material .ag-row:hover,
+.ag-theme-material .ag-row:hover .ag-cell {
+  background-color: #10324e !important;
+  color: #f4f9ff !important;
+}
+
+.ag-theme-material .ag-row-hover .ag-cell-value,
+.ag-theme-material .ag-row:hover .ag-cell-value {
+  color: #f4f9ff !important;
+}
+
+.ag-theme-material .ag-cell,
+.ag-theme-material .ag-paging-panel,
+.ag-theme-material .ag-paging-page-summary-panel,
+.ag-theme-material .ag-paging-row-summary-panel {
+  color: #d9e7f7 !important;
+}
+
+.ag-theme-material .ag-cell {
+  display: flex !important;
+  align-items: center;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: transparent !important;
+}
+
+.ag-theme-material .ag-icon,
+.ag-theme-material .ag-paging-button {
+  color: #8fb4d6 !important;
+}
+
+.ag-theme-material .ag-root-wrapper {
+  border: 0 !important;
+  border-radius: 8px;
+}
+
+.ag-theme-material .ag-cell-value,
+.ag-theme-material .ag-group-value {
+  color: #e7f1fc !important;
+}
+
+.ag-theme-material .ag-overlay-no-rows-wrapper {
+  background: #0d2136;
+  color: #8fa8c1;
+}
+
+.ag-theme-material .ag-paging-panel {
+  min-height: 54px;
+  border-top-color: rgba(83, 132, 170, 0.22) !important;
+}
+
+.ag-theme-material .ag-picker-field-wrapper,
+.ag-theme-material .ag-select,
+.ag-theme-material .ag-select-list,
+.ag-theme-material .ag-list,
+.ag-theme-material .ag-popup-child {
+  background: #0b1d31 !important;
+  border-color: rgba(83, 132, 170, 0.24) !important;
+  color: #d9e7f7 !important;
+}
+
+.ag-theme-material .ag-picker-field-wrapper {
+  min-height: 32px;
+  border-radius: 6px;
+}
+
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-raised-button.mat-accent,
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-protected-button-container-color: #07111e;
+  --mdc-protected-button-label-text-color: #9fdcff;
+  border: 1px solid rgba(14, 165, 255, 0.22);
+  border-radius: 999px;
+}
+
+.mat-mdc-button.mat-warn {
+  --mdc-text-button-label-text-color: #9fcfff;
+}
+
+// Empty states
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: #718aa3;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    color: #0ea5ff;
+  }
+}
+
+// Loading spinner overlay
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 17, 29, 0.82);
+  z-index: 1000;
+}
+
+// Responsive utilities
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-mobile {
+    display: none !important;
+  }
+}
