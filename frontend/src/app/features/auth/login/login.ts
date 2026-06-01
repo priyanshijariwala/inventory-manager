@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/services/auth';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -21,8 +21,7 @@ import { HttpErrorResponse } from '@angular/common/http';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatCardModule,
-    MatIconModule,
-    RouterLink
+    MatIconModule
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',

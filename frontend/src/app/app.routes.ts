@@ -9,12 +9,6 @@ export const routes: Routes = [
         .then(m => m.Login)
   },
   {
-    path: 'register',
-    loadComponent: () =>
-      import('./features/auth/register/register')
-        .then(m => m.Register)
-  },
-  {
     path: 'dashboard',
     canActivate: [authGuard],
     loadComponent: () =>
