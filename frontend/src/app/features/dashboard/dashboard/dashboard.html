@@ -23,7 +23,12 @@
           <span>Inventory Value</span>
           <mat-icon>account_balance_wallet</mat-icon>
         </div>
-        <strong>{{ report?.totalInventoryValue | centsCurrency }}</strong>
+        <ng-container *ngIf="report; else reportUnavailable">
+          <strong>{{ report.totalInventoryValue | centsCurrency }}</strong>
+        </ng-container>
+        <ng-template #reportUnavailable>
+          <span class="report-unavailable">{{ reportMessage || 'Report unavailable' }}</span>
+        </ng-template>
         <div class="metric-footer positive">
           <mat-icon>trending_up</mat-icon>
           <span>Total assets tracked</span>
@@ -127,7 +132,7 @@
               <mat-card-title>Stock Movement</mat-card-title>
               <mat-card-subtitle>Recent operating rhythm</mat-card-subtitle>
             </div>
-            <button mat-button routerLink="/reports">Reports</button>
+            <button *ngIf="canViewReports" mat-button routerLink="/reports">Reports</button>
           </div>
         </mat-card-header>
         <mat-card-content>

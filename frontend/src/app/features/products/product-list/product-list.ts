@@ -26,6 +26,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { AutoFocusDirective } from '../../../shared/directives/auto-focus.directive';
 import { CentsCurrencyPipe } from '../../../shared/pipes/cents-currency.pipe';
 import { RelativeTimePipe } from '../../../shared/pipes/relative-time.pipe';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-product-list',
@@ -54,8 +55,10 @@ export class ProductList implements OnInit {
   private toast = inject(ToastService);
   private centsCurrencyPipe = new CentsCurrencyPipe();
   private relativeTimePipe = new RelativeTimePipe();
+  private authService = inject(AuthService);
 
   categories: Category[] = [];
+  canModify = true;
   loading = false;
   selectedCategory = '';
   selectedStatus: boolean | '' = '';
@@ -95,17 +98,26 @@ export class ProductList implements OnInit {
       resizable: false,
       cellRenderer: (params: any) => {
         if (!params.data?.id) return '';
-        return `
-          <div class="grid-actions">
-            <button class="grid-action-btn adjust" data-action="adjust" data-id="${params.data.id}" title="Adjust Stock">
-              <span>inventory_2</span>
-            </button>
+        const adjustBtn = `
+          <button class="grid-action-btn adjust" data-action="adjust" data-id="${params.data.id}" title="Adjust Stock">
+            <span>inventory_2</span>
+          </button>
+        `;
+        let editDelete = '';
+        if (this.canModify) {
+          editDelete = `
             <button class="grid-action-btn edit" data-action="edit" data-id="${params.data.id}" title="Edit">
               <span>edit</span>
             </button>
             <button class="grid-action-btn delete" data-action="delete" data-id="${params.data.id}" title="Delete">
               <span>delete</span>
             </button>
+          `;
+        }
+        return `
+          <div class="grid-actions">
+            ${adjustBtn}
+            ${editDelete}
           </div>
         `;
       }
@@ -129,6 +141,7 @@ export class ProductList implements OnInit {
   };
 
   ngOnInit() {
+    this.canModify = !this.authService.hasRole('staff');
     this.loadCategories();
     this.rowDataSource = this.createProductDatasource();
   }

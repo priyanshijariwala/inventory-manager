@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, signal, inject, OnInit, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, Router, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -54,23 +54,36 @@ export class App implements OnInit {
 
     this.isDrawerOpen$ = this.isScreenLarge$;
 
-    // Get user info from token or storage
+    this.authService.initAuth();
     this.loadUserInfo();
+
+    // react to user signal changes so UI updates immediately after login/logout
+    effect(() => {
+      const user = this.authService.user();
+      if (user) {
+        this.userName = user?.email || user?.sub || 'User';
+        this.userRole = user?.role || '';
+      } else {
+        const stored = this.authService.getCurrentUser();
+        if (stored) {
+          this.userName = stored?.email || stored?.sub || 'User';
+          this.userRole = stored?.role || '';
+        } else {
+          this.userName = 'User';
+          this.userRole = '';
+        }
+      }
+    });
   }
 
   loadUserInfo() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const tokenParts = token.split('.');
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          this.userName = payload?.email || payload?.sub || 'User';
-          this.userRole = payload?.role || '';
-        }
-      } catch (e) {
-        // Invalid token, ignore
-      }
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.userName = user?.email || user?.sub || 'User';
+      this.userRole = user?.role || '';
+    } else {
+      this.userName = 'User';
+      this.userRole = '';
     }
   }
 

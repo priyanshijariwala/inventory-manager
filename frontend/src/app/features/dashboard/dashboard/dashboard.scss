@@ -112,6 +112,16 @@
     font-weight: 700;
   }
 
+  .report-unavailable {
+    display: block;
+    margin: 16px 0 10px;
+    color: #d9e7f7;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    max-width: 85%;
+  }
+
   .metric-top mat-icon {
     color: #0ea5ff;
   }

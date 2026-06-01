@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -10,14 +10,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
-import { FormsModule } from '@angular/forms';
+
 import { StockMovementService } from '../../shared/services/stock-movement.service';
 import { StockReport } from '../../shared/models/stock-movement.model';
 import { MovementType } from '../../shared/models/stock-movement.model';
 import { CentsCurrencyPipe } from '../../shared/pipes/cents-currency.pipe';
+import { ToastrService } from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
@@ -34,10 +36,9 @@ import { CentsCurrencyPipe } from '../../shared/pipes/cents-currency.pipe';
     MatNativeDateModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule,
     MatGridListModule,
     MatListModule,
-    FormsModule,
+    
     CentsCurrencyPipe
   ],
   templateUrl: './reports.component.html',
@@ -45,13 +46,15 @@ import { CentsCurrencyPipe } from '../../shared/pipes/cents-currency.pipe';
 })
 export class ReportsComponent implements OnInit {
   private stockMovementService = inject(StockMovementService);
-  private snackBar = inject(MatSnackBar);
   private fb = inject(FormBuilder);
+  private toastr = inject(ToastrService);
+  private destroy$ = new Subject<void>();
 
   report!: StockReport | null;
   loading = false;
   startDate = '';
   endDate = '';
+  filterForm!: FormGroup;
 
   movementTypeLabels: Record<string, string> = {
     [MovementType.RESTOCK]: 'Restock',
@@ -70,6 +73,33 @@ export class ReportsComponent implements OnInit {
   };
 
   ngOnInit() {
+    // initialize default date range: last 1 month
+    const end = new Date();
+    const start = new Date(end);
+    start.setMonth(start.getMonth() - 1);
+
+    this.filterForm = this.fb.group({
+      startDate: [start],
+      endDate: [end]
+    });
+
+    this.filterForm.valueChanges.pipe(
+      map(v => ({
+        s: v.startDate ? new Date(v.startDate).toISOString().split('T')[0] : undefined,
+        e: v.endDate ? new Date(v.endDate).toISOString().split('T')[0] : undefined
+      })),
+      debounceTime(300),
+      distinctUntilChanged((a, b) => a.s === b.s && a.e === b.e),
+      takeUntil(this.destroy$)
+    ).subscribe(({ s, e }) => {
+      this.startDate = s || '';
+      this.endDate = e || '';
+      this.loadReport();
+    });
+
+    // set initial values and load
+    this.startDate = start.toISOString().split('T')[0];
+    this.endDate = end.toISOString().split('T')[0];
     this.loadReport();
   }
 
@@ -83,8 +113,9 @@ export class ReportsComponent implements OnInit {
         this.report = report;
         this.loading = false;
       },
-      error: () => {
-        this.snackBar.open('Failed to load report', 'Close', { duration: 3000 });
+      error: (err: any) => {
+        const msg = err?.error?.message || 'Failed to load report';
+        this.toastr.error(msg, 'Error');
         this.loading = false;
       }
     });
@@ -95,9 +126,12 @@ export class ReportsComponent implements OnInit {
   }
 
   clearFilters() {
-    this.startDate = '';
-    this.endDate = '';
-    this.loadReport();
+    this.filterForm.setValue({ startDate: null, endDate: null });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   formatNumber(value: number): string {

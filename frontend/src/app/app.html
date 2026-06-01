@@ -46,12 +46,12 @@
         <mat-icon matListItemIcon>swap_horiz</mat-icon>
         <span matListItemTitle>Stock Movements</span>
       </a>
-      <a mat-list-item routerLinkActive="active" [routerLink]="['/reports']" (click)="closeSidenavOnMobile()">
+      <a *ngIf="userRole !== 'staff'" mat-list-item routerLinkActive="active" [routerLink]="['/reports']" (click)="closeSidenavOnMobile()">
         <mat-icon matListItemIcon>assessment</mat-icon>
         <span matListItemTitle>Reports</span>
       </a>
       <mat-divider></mat-divider>
-      <a mat-list-item routerLinkActive="active" [routerLink]="['/users']" (click)="closeSidenavOnMobile()">
+      <a  *ngIf="userRole !== 'staff'" mat-list-item routerLinkActive="active" [routerLink]="['/users']" (click)="closeSidenavOnMobile()">
         <mat-icon matListItemIcon>people</mat-icon>
         <span matListItemTitle>Users</span>
       </a>

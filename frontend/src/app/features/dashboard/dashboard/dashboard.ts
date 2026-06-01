@@ -20,6 +20,7 @@ import { Router, RouterLink } from '@angular/router';
 import { StockReport } from '../../../shared/models/stock-movement.model';
 import { CentsCurrencyPipe } from '../../../shared/pipes/cents-currency.pipe';
 import { RelativeTimePipe } from '../../../shared/pipes/relative-time.pipe';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-dashboard',
@@ -48,6 +49,7 @@ export class Dashboard implements OnInit {
   private userService = inject(UserService);
   private stockMovementService = inject(StockMovementService);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   totalProducts = 0;
   totalCategories = 0;
@@ -59,7 +61,12 @@ export class Dashboard implements OnInit {
   recentMovements: any[] = [];
   loading = true;
   report: StockReport | null = null;
+  reportMessage = '';
   today = new Date();
+
+  get canViewReports(): boolean {
+    return !this.authService.hasRole('staff');
+  }
 
   ngOnInit() {
     this.loadDashboardData();
@@ -127,16 +134,23 @@ export class Dashboard implements OnInit {
       }
     });
 
-    // Load report data
-    this.stockMovementService.getStockReport().subscribe({
-      next: (report) => {
-        this.report = report;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
+    // Load report data only for managers
+    if (this.canViewReports) {
+      this.stockMovementService.getStockReport().subscribe({
+        next: (report) => {
+          this.report = report;
+          this.loading = false;
+        },
+        error: () => {
+          this.reportMessage = 'Unable to load report data.';
+          this.loading = false;
+        }
+      });
+    } else {
+      this.report = null;
+      this.reportMessage = 'Report details are unavailable for staff accounts.';
+      this.loading = false;
+    }
   }
 
   navigateTo(path: string) {

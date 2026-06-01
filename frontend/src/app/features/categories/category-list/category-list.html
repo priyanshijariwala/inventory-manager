@@ -1,7 +1,7 @@
 <div class="categories-container">
   <div class="header">
     <h1>Categories</h1>
-    <button mat-raised-button color="primary" (click)="openAddCategory()">
+    <button *ngIf="canModify" mat-raised-button color="primary" (click)="openAddCategory()">
       <mat-icon>add</mat-icon>
       Add Category
     </button>

@@ -15,6 +15,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CategoryFormComponent } from '../category-form/category-form';
 import { RelativeTimePipe } from '../../../shared/pipes/relative-time.pipe';
 import { CinformationComponent } from '../../../shared/components/cinformation/cinformation.component';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-category-list',
@@ -35,10 +36,12 @@ export class CategoryList implements OnInit {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private relativeTimePipe = new RelativeTimePipe();
+  private authService = inject(AuthService);
 
   loading = false;
   gridApi: any;
   rowDataSource: any;
+  canModify = true;
 
   columnDefs: ColDef[] = [
     { field: 'name', headerName: 'Category Name', flex: 2, minWidth: 150 },
@@ -55,14 +58,20 @@ export class CategoryList implements OnInit {
       resizable: false,
       cellRenderer: (params: any) => {
         if (!params.data?.id) return '';
-        return `
-          <div class="grid-actions">
+        let editBtns = '';
+        if (this.canModify) {
+          editBtns = `
             <button class="grid-action-btn edit" data-action="edit" data-id="${params.data.id}" title="Edit">
               <span>edit</span>
             </button>
             <button class="grid-action-btn delete" data-action="delete" data-id="${params.data.id}" title="Delete">
               <span>delete</span>
             </button>
+          `;
+        }
+        return `
+          <div class="grid-actions">
+            ${editBtns}
           </div>
         `;
       }
@@ -86,6 +95,7 @@ export class CategoryList implements OnInit {
   };
 
   ngOnInit() {
+    this.canModify = !this.authService.hasRole('staff');
     this.rowDataSource = this.createCategoryDatasource();
   }
 
