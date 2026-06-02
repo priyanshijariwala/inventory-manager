@@ -13,6 +13,14 @@ export class ApiService {
     return this.http.get<T>(`${environment.apiUrl}/${url}`);
   }
 
+  getBlob(url: string): Observable<Blob> {
+    return this.http.get(`${environment.apiUrl}/${url}`, { responseType: 'blob' });
+  }
+
+  postFormData<T = any>(url: string, data: FormData): Observable<T> {
+    return this.http.post<T>(`${environment.apiUrl}/${url}`, data);
+  }
+
   post<T = any>(url: string, data: any): Observable<T> {
     return this.http.post<T>(`${environment.apiUrl}/${url}`, data);
   }

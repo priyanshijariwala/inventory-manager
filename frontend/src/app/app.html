@@ -9,8 +9,11 @@
     <button mat-icon-button matTooltip="Notifications">
       <mat-icon class="mymenu">notifications</mat-icon>
     </button>
-    <button mat-icon-button [matMenuTriggerFor]="userMenu" [matTooltip]="userName">
+    <button mat-icon-button (click)="openProfileDrawer()" matTooltip="Profile">
       <mat-icon class="mymenu">account_circle</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" matTooltip="More actions">
+      <mat-icon class="mymenu">more_vert</mat-icon>
     </button>
     <mat-menu #userMenu="matMenu">
       <div class="user-menu-header">
@@ -18,6 +21,10 @@
         <span *ngIf="userRole">{{ userRole | titlecase }}</span>
       </div>
       <mat-divider></mat-divider>
+      <button mat-menu-item (click)="openProfileDrawer()">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Logout</span>
@@ -56,6 +63,45 @@
         <span matListItemTitle>Users</span>
       </a>
     </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav #profileDrawer position="end" mode="over" class="profile-drawer">
+    <div class="profile-drawer-content">
+      <div class="drawer-header">
+        <div>
+          <h2>Profile</h2>
+          <p>Manage your profile information and picture.</p>
+        </div>
+        <button mat-icon-button (click)="closeProfileDrawer()" aria-label="Close profile drawer">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="profile-avatar-block">
+        <div class="profile-avatar" [class.has-image]="profileImage()">
+          <img *ngIf="profileImage()" [src]="profileImage()" alt="Profile picture" />
+          <span *ngIf="!profileImage()">{{ getUserInitials() }}</span>
+        </div>
+        <div class="profile-details">
+          <strong>{{ userName }}</strong>
+          <span *ngIf="userRole">{{ userRole | titlecase }}</span>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button mat-flat-button color="primary" (click)="triggerProfileUpload()">Upload picture</button>
+        <button mat-stroked-button color="warn" (click)="removeProfileImage()" [disabled]="!profileImage()">Remove picture</button>
+      </div>
+      <div class="profile-meta">
+        <div class="meta-row">
+          <span>Email</span>
+          <strong>{{ userName }}</strong>
+        </div>
+        <div class="meta-row">
+          <span>Role</span>
+          <strong>{{ userRole ? (userRole | titlecase) : 'User' }}</strong>
+        </div>
+      </div>
+      <input type="file" #profileFileInput accept="image/*" style="display:none" (change)="onProfilePictureSelected($event)" />
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content class="main-content">

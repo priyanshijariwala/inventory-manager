@@ -82,6 +82,16 @@ export class ProductService {
     return this.api.delete<void>(`products/${id}`);
   }
 
+  downloadImportSample(): Observable<Blob> {
+    return this.api.getBlob('products/import/sample');
+  }
+
+  importProducts(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.api.postFormData<any>('products/import', formData);
+  }
+
   setProducts(products: Product[]) {
     this.productsSubject.next(products);
   }

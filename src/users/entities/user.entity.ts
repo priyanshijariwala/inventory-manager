@@ -16,6 +16,9 @@ export class User {
   @Column({ type: 'simple-enum', enum: UserRole })
   role: UserRole;
 
+  @Column({ type: 'text', nullable: true })
+  profileImage: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 }

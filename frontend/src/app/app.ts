@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, ViewChild, effect } from '@angular/core';
+import { Component, signal, inject, OnInit, ViewChild, ElementRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, Router, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,6 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from './core/services/auth';
+import { ProfileService } from './core/services/profile.service';
 import { BreakpointObserver, BreakpointState, Breakpoints } from '@angular/cdk/layout';
 import { map, Observable } from 'rxjs';
 
@@ -38,8 +39,12 @@ export class App implements OnInit {
   private router = inject(Router);
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
+  @ViewChild('profileDrawer') profileDrawer!: MatSidenav;
+  @ViewChild('profileFileInput', { static: false }) profileFileInput!: ElementRef<HTMLInputElement>;
 
   protected readonly title = signal('Inventory Manager');
+  protected readonly profileService = inject(ProfileService);
+  protected readonly profileImage = this.profileService.profileImage;
 
   isScreenLarge$!: Observable<boolean>;
   isDrawerOpen$!: Observable<boolean>;
@@ -56,6 +61,7 @@ export class App implements OnInit {
 
     this.authService.initAuth();
     this.loadUserInfo();
+    this.loadProfile();
 
     // react to user signal changes so UI updates immediately after login/logout
     effect(() => {
@@ -74,6 +80,7 @@ export class App implements OnInit {
         }
       }
     });
+
   }
 
   loadUserInfo() {
@@ -87,10 +94,72 @@ export class App implements OnInit {
     }
   }
 
+  loadProfile() {
+    this.profileService.loadProfile().subscribe({
+      next: () => {},
+      error: (error) => {
+        console.error('Unable to load profile image', error);
+      },
+    });
+  }
+
   closeSidenavOnMobile() {
     if (!this.isScreenLarge$) {
       this.sidenav?.close();
     }
+  }
+
+  openProfileDrawer() {
+    this.profileDrawer?.open();
+  }
+
+  closeProfileDrawer() {
+    this.profileDrawer?.close();
+  }
+
+  triggerProfileUpload() {
+    if (!this.profileFileInput?.nativeElement) {
+      return;
+    }
+    this.profileFileInput.nativeElement.value = '';
+    this.profileFileInput.nativeElement.click();
+  }
+
+  onProfilePictureSelected(event: Event) {
+    const input = (event.currentTarget || event.target) as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    this.profileService.uploadProfileImage(file).subscribe({
+      next: () => {
+        input.value = '';
+      },
+      error: (error) => {
+        console.error('Profile upload failed:', error);
+        input.value = '';
+      },
+    });
+  }
+
+  removeProfileImage() {
+    this.profileService.removeProfileImage().subscribe({
+      next: () => {},
+      error: (error) => {
+        console.error('Removing profile image failed:', error);
+      },
+    });
+  }
+
+  getUserInitials() {
+    return this.userName
+      .split(' ')
+      .map(part => part[0] || '')
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || 'U';
   }
 
   navigate(path: string) {

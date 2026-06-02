@@ -5,6 +5,10 @@
       Products
     </h1>
     <div class="header-actions">
+      <button *ngIf="canModify" mat-stroked-button color="primary" (click)="openImportDialog()">
+        <mat-icon>file_upload</mat-icon>
+        Import Products
+      </button>
       <button *ngIf="canModify" mat-raised-button color="primary" (click)="openAddProduct()">
         <mat-icon>add</mat-icon>
         Add Product

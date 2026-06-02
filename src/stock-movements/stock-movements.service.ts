@@ -9,6 +9,9 @@ import { User } from '../users/entities/user.entity';
 import { AdjustStockDto } from './dto/adjust-stock.dto';
 import { ListStockMovementsQueryDto } from './dto/list-stock-movements-query.dto';
 import { StockMovement } from './entities/stock-movement.entity';
+import { Workbook } from 'exceljs';
+import PDFDocument from 'pdfkit';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class StockMovementsService {
@@ -116,6 +119,167 @@ export class StockMovementsService {
       where: { product: { id: productId } },
       relations: { performedBy: true, product: true },
       order: { createdAt: 'DESC' },
+    });
+  }
+
+  private buildFilteredQuery(query: ListStockMovementsQueryDto) {
+    const qb = this.movementsRepo
+      .createQueryBuilder('movement')
+      .leftJoinAndSelect('movement.product', 'product')
+      .leftJoinAndSelect('movement.performedBy', 'performedBy')
+      .orderBy('movement.createdAt', 'DESC');
+
+    if (query.productId) {
+      qb.andWhere('product.id = :productId', { productId: query.productId });
+    }
+    if (query.type) {
+      qb.andWhere('movement.type = :type', { type: query.type });
+    }
+    if (query.startDate) {
+      qb.andWhere('movement.createdAt >= :startDate', { startDate: query.startDate });
+    }
+    if (query.endDate) {
+      qb.andWhere('movement.createdAt <= :endDate', { endDate: query.endDate });
+    }
+
+    return qb;
+  }
+
+  async exportStockMovementsToExcel(query: ListStockMovementsQueryDto) {
+    const movements = await this.buildFilteredQuery(query).getMany();
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Stock Movements');
+
+    worksheet.columns = [
+      { header: 'Date', key: 'createdAt', width: 24 },
+      { header: 'Product', key: 'productName', width: 25 },
+      { header: 'SKU', key: 'sku', width: 16 },
+      { header: 'Type', key: 'type', width: 14 },
+      { header: 'Quantity', key: 'quantity', width: 12 },
+      { header: 'Stock Before', key: 'stockBefore', width: 14 },
+      { header: 'Stock After', key: 'stockAfter', width: 14 },
+      { header: 'Reason', key: 'reason', width: 24 },
+      { header: 'Reference', key: 'reference', width: 18 },
+      { header: 'Performed By', key: 'performedBy', width: 24 },
+    ];
+
+    movements.forEach((movement) => {
+      worksheet.addRow({
+        createdAt: movement.createdAt?.toISOString() ?? '',
+        productName: movement.product?.name ?? '',
+        sku: movement.product?.sku ?? '',
+        type: movement.type,
+        quantity: movement.quantity,
+        stockBefore: movement.stockBefore,
+        stockAfter: movement.stockAfter,
+        reason: movement.reason ?? '',
+        reference: movement.reference ?? '',
+        performedBy: movement.performedBy?.email ?? '',
+      });
+    });
+
+    worksheet.getRow(1).font = { bold: true };
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  async exportStockMovementsToPdf(query: ListStockMovementsQueryDto) {
+    const movements = await this.buildFilteredQuery(query).getMany();
+    const doc = new PDFDocument({ size: 'A4', margin: 40 });
+    const stream = new PassThrough();
+    const chunks: Buffer[] = [];
+
+    const headers = [
+      { title: 'Date', width: 70 },
+      { title: 'Product', width: 100 },
+      { title: 'SKU', width: 50 },
+      { title: 'Type', width: 50 },
+      { title: 'Qty', width: 35 },
+      { title: 'Before', width: 40 },
+      { title: 'After', width: 40 },
+      { title: 'Performed By', width: 90 },
+    ];
+
+    const formatDate = (date?: Date | string) => {
+      if (!date) return '';
+      const parsed = date instanceof Date ? date : new Date(date);
+      return parsed.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    };
+
+    let y = 40;
+    const margin = 40;
+    const rowHeight = 18;
+
+    const drawHeader = () => {
+      y += 10;
+      doc.fontSize(18).font('Helvetica-Bold').text('Stock Movements', margin, y);
+      y += 24;
+      doc.fontSize(10).font('Helvetica-Bold');
+      let x = margin;
+      headers.forEach((column) => {
+        doc.text(column.title, x, y, { width: column.width, continued: false });
+        x += column.width;
+      });
+      y += 16;
+      doc.moveTo(margin, y - 4).lineTo(doc.page.width - margin, y - 4).stroke();
+    };
+
+    const addRow = (movement: StockMovement) => {
+      if (y + rowHeight * 3 > doc.page.height - margin) {
+        doc.addPage();
+        y = margin;
+        drawHeader();
+      }
+
+      const rowValues = [
+        formatDate(movement.createdAt),
+        movement.product?.name ?? '',
+        movement.product?.sku ?? '',
+        movement.type,
+        movement.quantity.toString(),
+        movement.stockBefore.toString(),
+        movement.stockAfter.toString(),
+        movement.performedBy?.email ?? '',
+      ];
+      let x = margin;
+      doc.fontSize(9).font('Helvetica');
+      rowValues.forEach((value, index) => {
+        doc.text(value, x, y, { width: headers[index].width, ellipsis: true });
+        x += headers[index].width;
+      });
+      y += rowHeight;
+
+      const notes = [movement.reason, movement.reference].filter(Boolean).join(' | ');
+      if (notes) {
+        doc.fontSize(8).fillColor('#555');
+        doc.text(`Notes: ${notes}`, margin, y, { width: doc.page.width - margin * 2 });
+        y += 14;
+        doc.fillColor('black');
+      }
+    };
+
+    doc.pipe(stream);
+    drawHeader();
+
+    if (movements.length === 0) {
+      y += 10;
+      doc.fontSize(10).text('No stock movement records available for the selected filter.', margin, y);
+    } else {
+      movements.forEach(addRow);
+    }
+
+    doc.end();
+
+    return new Promise<Buffer>((resolve, reject) => {
+      stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+      stream.on('end', () => resolve(Buffer.concat(chunks)));
+      stream.on('error', reject);
     });
   }
 

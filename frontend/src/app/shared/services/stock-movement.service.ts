@@ -32,6 +32,34 @@ export class StockMovementService {
     return this.api.post<StockMovement>('stock-movements', dto);
   }
 
+  downloadStockMovementsExcel(filter?: StockMovementFilter): Observable<Blob> {
+    let url = 'stock-movements/export/excel';
+    if (filter) {
+      const params = new URLSearchParams();
+      if (filter.productId) params.append('productId', filter.productId);
+      if (filter.type) params.append('type', filter.type);
+      if (filter.startDate) params.append('startDate', filter.startDate);
+      if (filter.endDate) params.append('endDate', filter.endDate);
+      const query = params.toString();
+      if (query) url += '?' + query;
+    }
+    return this.api.getBlob(url);
+  }
+
+  downloadStockMovementsPdf(filter?: StockMovementFilter): Observable<Blob> {
+    let url = 'stock-movements/export/pdf';
+    if (filter) {
+      const params = new URLSearchParams();
+      if (filter.productId) params.append('productId', filter.productId);
+      if (filter.type) params.append('type', filter.type);
+      if (filter.startDate) params.append('startDate', filter.startDate);
+      if (filter.endDate) params.append('endDate', filter.endDate);
+      const query = params.toString();
+      if (query) url += '?' + query;
+    }
+    return this.api.getBlob(url);
+  }
+
   getStockReport(startDate?: string, endDate?: string): Observable<StockReport> {
     let url = 'stock-movements/report';
     const params = new URLSearchParams();

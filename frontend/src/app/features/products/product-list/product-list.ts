@@ -20,6 +20,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { ProductFormComponent } from '../product-form/product-form';
+import { ProductImportDialogComponent } from '../product-import-dialog/product-import-dialog';
 import { CinformationComponent } from '../../../shared/components/cinformation/cinformation.component';
 import { StockAdjustmentDialogComponent } from '../../stock-movements/stock-adjustment-dialog/stock-adjustment-dialog';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -43,7 +44,8 @@ import { AuthService } from '../../../core/services/auth';
     FormsModule,
     MatCardModule,
     MatInputModule,
-    AutoFocusDirective
+    AutoFocusDirective,
+    ProductImportDialogComponent
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
@@ -174,6 +176,19 @@ export class ProductList implements OnInit {
       width: '620px',
       maxWidth: '95vw',
       data: { categories: this.categories }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.refreshProducts();
+      }
+    });
+  }
+
+  openImportDialog() {
+    const dialogRef = this.dialog.open(ProductImportDialogComponent, {
+      width: '620px',
+      maxWidth: '95vw',
     });
 
     dialogRef.afterClosed().subscribe(result => {

@@ -41,7 +41,9 @@
     "socket.io": "^4.8.3",
     "sqlite3": "^5.1.7",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "^0.3.28"
+    "typeorm": "^0.3.28",
+    "exceljs": "^4.3.1",
+    "pdfkit": "^0.13.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

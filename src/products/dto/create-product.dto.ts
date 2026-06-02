@@ -45,4 +45,9 @@ export class CreateProductDto {
   @IsUUID()
   @IsOptional()
   categoryId?: string;
+
+  @ApiPropertyOptional({ example: 'Example Category' })
+  @IsString()
+  @IsOptional()
+  categoryName?: string;
 }

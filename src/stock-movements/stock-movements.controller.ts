@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -9,6 +9,7 @@ import { AdjustStockDto } from './dto/adjust-stock.dto';
 import { ListStockMovementsQueryDto } from './dto/list-stock-movements-query.dto';
 import { StockMovementsService } from './stock-movements.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import type { Response } from 'express';
 
 
 @Controller('stock-movements')
@@ -32,6 +33,30 @@ export class StockMovementsController {
   @Get('product/:productId')
   findByProduct(@Param('productId') productId: string) {
     return this.stockMovementsService.findByProduct(productId);
+  }
+
+  @ApiBearerAuth()
+  @Get('export/excel')
+  async exportExcel(@Res() res: Response, @Query() query: ListStockMovementsQueryDto) {
+    const buffer = await this.stockMovementsService.exportStockMovementsToExcel(query);
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="stock-movements.xlsx"',
+      'Content-Length': buffer.length,
+    });
+    res.send(buffer);
+  }
+
+  @ApiBearerAuth()
+  @Get('export/pdf')
+  async exportPdf(@Res() res: Response, @Query() query: ListStockMovementsQueryDto) {
+    const buffer = await this.stockMovementsService.exportStockMovementsToPdf(query);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="stock-movements.pdf"',
+      'Content-Length': buffer.length,
+    });
+    res.send(buffer);
   }
 
   @ApiBearerAuth()

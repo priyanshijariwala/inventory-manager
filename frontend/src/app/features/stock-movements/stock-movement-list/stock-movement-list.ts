@@ -8,6 +8,7 @@ import 'ag-grid-community/styles/ag-theme-material.css';
 ModuleRegistry.registerModules([AllCommunityModule]);
 import { StockMovementService } from '../../../shared/services/stock-movement.service';
 import { ProductService } from '../../../shared/services/product.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import { MovementType, StockMovementFilter } from '../../../shared/models/stock-movement.model';
 import { Product } from '../../../shared/models/product.model';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
 import { RelativeTimePipe } from '../../../shared/pipes/relative-time.pipe';
 import { SearchPipe } from '../../../shared/pipes/search-pipe';
@@ -42,6 +44,7 @@ import { SearchPipe } from '../../../shared/pipes/search-pipe';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    MatMenuModule,
     RouterLink,
     SearchPipe
   ],
@@ -51,6 +54,7 @@ import { SearchPipe } from '../../../shared/pipes/search-pipe';
 export class StockMovementList implements OnInit {
   private stockMovementService = inject(StockMovementService);
   private productService = inject(ProductService);
+  private toast = inject(ToastService);
   private snackBar = inject(MatSnackBar);
   private relativeTimePipe = new RelativeTimePipe();
 
@@ -210,6 +214,44 @@ export class StockMovementList implements OnInit {
     this.setDefaultDateRange();
     this.productSearchText = '';
     this.refreshGrid();
+  }
+
+  downloadExcel() {
+    const filter = this.buildExportFilter();
+    this.stockMovementService.downloadStockMovementsExcel(filter).subscribe({
+      next: (blob) => this.saveBlob(blob, 'stock-movements.xlsx'),
+      error: (error) => {
+        this.toast.error(error, 'Failed to download Excel');
+      }
+    });
+  }
+
+  downloadPdf() {
+    const filter = this.buildExportFilter();
+    this.stockMovementService.downloadStockMovementsPdf(filter).subscribe({
+      next: (blob) => this.saveBlob(blob, 'stock-movements.pdf'),
+      error: (error) => {
+        this.toast.error(error, 'Failed to download PDF');
+      }
+    });
+  }
+
+  private buildExportFilter(): StockMovementFilter {
+    const filter: StockMovementFilter = {};
+    if (this.selectedProduct) filter.productId = this.selectedProduct;
+    if (this.selectedType) filter.type = this.selectedType as MovementType;
+    if (this.isValidDate(this.startDate)) filter.startDate = this.toIsoDateBoundary(this.startDate, 'start');
+    if (this.isValidDate(this.endDate)) filter.endDate = this.toIsoDateBoundary(this.endDate, 'end');
+    return filter;
+  }
+
+  private saveBlob(blob: Blob, filename: string) {
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
   }
 
   private toIsoDateBoundary(date: Date, boundary: 'start' | 'end'): string {

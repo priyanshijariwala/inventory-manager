@@ -2,6 +2,20 @@
   <div class="header">
     <h1>Stock Movements</h1>
     <div class="header-actions">
+      <button mat-stroked-button color="primary" [matMenuTriggerFor]="exportMenu">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="downloadPdf()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>Download PDF</span>
+        </button>
+        <button mat-menu-item (click)="downloadExcel()">
+          <mat-icon>table_chart</mat-icon>
+          <span>Download Excel</span>
+        </button>
+      </mat-menu>
       <a mat-raised-button color="accent" routerLink="/products">
         <mat-icon>add_shopping_cart</mat-icon>
         Adjust Stock

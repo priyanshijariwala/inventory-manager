@@ -1,6 +1,8 @@
-import { ConflictException, Injectable, OnModuleInit } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 import { Repository } from 'typeorm';
 import { UserRole } from '../common/enums/user-role.enum';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -38,8 +40,71 @@ export class UsersService implements OnModuleInit {
     });
   }
 
-  findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<User | null> {
     return this.usersRepo.findOne({ where: { email: email.toLowerCase() } });
+  }
+
+  async findProfileById(userId: string): Promise<Partial<User>> {
+    const user = await this.usersRepo.findOne({
+      where: { id: userId },
+      select: { id: true, email: true, role: true, createdAt: true, profileImage: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async updateProfileImage(userId: string, profileImage: string): Promise<Partial<User>> {
+    const user = await this.usersRepo.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.profileImage && user.profileImage !== profileImage) {
+      await this.deleteProfileImageFile(user.profileImage);
+    }
+
+    user.profileImage = profileImage;
+    const updated = await this.usersRepo.save(user);
+    return {
+      id: updated.id,
+      email: updated.email,
+      role: updated.role,
+      createdAt: updated.createdAt,
+      profileImage: updated.profileImage,
+    };
+  }
+
+  async clearProfileImage(userId: string): Promise<Partial<User>> {
+    const user = await this.usersRepo.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.profileImage) {
+      await this.deleteProfileImageFile(user.profileImage);
+    }
+
+    user.profileImage = null;
+    const updated = await this.usersRepo.save(user);
+    return {
+      id: updated.id,
+      email: updated.email,
+      role: updated.role,
+      createdAt: updated.createdAt,
+      profileImage: updated.profileImage,
+    };
+  }
+
+  private async deleteProfileImageFile(profileImage: string) {
+    const normalizedPath = profileImage.replace(/^\/(api\/)?/, '');
+    const absolutePath = join(__dirname, '..', '..', normalizedPath);
+    try {
+      await fs.unlink(absolutePath);
+    } catch (error) {
+      // ignore missing file or delete errors
+    }
   }
 
   private async ensureDefaultUser(email: string, password: string, role: UserRole): Promise<void> {

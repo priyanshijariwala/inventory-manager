@@ -1,0 +1,55 @@
+<div class="import-dialog">
+  <div class="dialog-header">
+    <div>
+      <h2>Import Products</h2>
+      <p>Upload a .xlsx file to create or update products by SKU.</p>
+    </div>
+    <button mat-icon-button aria-label="Close dialog" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="dialog-content-body">
+      <div class="import-actions">
+        <button mat-flat-button color="primary" (click)="downloadSample()" [disabled]="downloadingSample || uploading">
+          <mat-icon>download</mat-icon>
+          <span *ngIf="!downloadingSample">Download Sample</span>
+          <mat-progress-spinner *ngIf="downloadingSample" diameter="18" mode="indeterminate"></mat-progress-spinner>
+        </button>
+
+        <div class="file-input-group">
+          <input type="file" accept=".xlsx" hidden id="import-file" (change)="onFileSelected($event)" />
+          <label for="import-file" class="file-select-button" [class.disabled]="uploading || downloadingSample">
+            <mat-icon>upload_file</mat-icon>
+            <span>Select Excel File</span>
+          </label>
+          <span class="file-name" *ngIf="fileName">{{ fileName }}</span>
+        </div>
+      </div>
+
+      <div class="import-help">
+        <p>Allowed file type: <strong>.xlsx</strong></p>
+        <p>Existing SKUs will be updated, new SKUs will be created.</p>
+        <p>Supported columns:</p>
+        <ul>
+          <li>sku</li>
+          <li>name</li>
+          <li>description</li>
+          <li>categoryName</li>
+          <li>price</li>
+          <li>quantity</li>
+        </ul>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="cancel()" [disabled]="uploading || downloadingSample">Cancel</button>
+    <button mat-raised-button color="primary" (click)="import()" [disabled]="!file || uploading || downloadingSample">
+      <mat-icon>file_upload</mat-icon>
+      <span *ngIf="!uploading">Import</span>
+      <mat-progress-spinner *ngIf="uploading" diameter="18" mode="indeterminate"></mat-progress-spinner>
+    </button>
+  </mat-dialog-actions>
+</div>

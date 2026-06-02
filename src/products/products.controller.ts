@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -8,6 +9,7 @@ import { ListProductsQueryDto } from './dto/list-products-query.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import type { Response } from 'express';
 
 @Controller('products')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -18,6 +20,27 @@ export class ProductsController {
   @Get('low-stock')
   findLowStock() {
     return this.productsService.findLowStock();
+  }
+
+  @ApiBearerAuth()
+  @Get('import/sample')
+  @Roles(UserRole.MANAGER)
+  async downloadImportSample(@Res() res: Response) {
+    const buffer = await this.productsService.createImportSampleWorkbook();
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="product-import-sample.xlsx"',
+      'Content-Length': buffer.length,
+    });
+    res.send(buffer);
+  }
+
+  @ApiBearerAuth()
+  @Post('import')
+  @Roles(UserRole.MANAGER)
+  @UseInterceptors(FileInterceptor('file'))
+  import(@UploadedFile() file: any) {
+    return this.productsService.importProductsFromExcel(file);
   }
 
   @ApiBearerAuth()
@@ -42,7 +65,14 @@ export class ProductsController {
   @ApiBearerAuth()
   @Patch(':id')
   @Roles(UserRole.MANAGER)
-  update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
+  patch(@Param('id') id: string, @Body() dto: UpdateProductDto) {
+    return this.productsService.update(id, dto);
+  }
+
+  @ApiBearerAuth()
+  @Put(':id')
+  @Roles(UserRole.MANAGER)
+  put(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.productsService.update(id, dto);
   }
 
