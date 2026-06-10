@@ -12,7 +12,7 @@ import { CategoryService } from '../../../shared/services/category.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { Product } from '../../../shared/models/product.model';
 import { Category } from '../../../shared/models/category.model';
-import { AutoFocusDirective } from '../../../shared/directives/auto-focus.directive';
+
 import { SearchPipe } from '../../../shared/pipes/search-pipe';
 
 @Component({
@@ -28,7 +28,7 @@ import { SearchPipe } from '../../../shared/pipes/search-pipe';
     MatSelectModule,
     MatIconModule,
     MatDialogModule,
-    AutoFocusDirective,
+
     SearchPipe
   ],
   templateUrl: './product-form.html',

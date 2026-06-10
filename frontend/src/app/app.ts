@@ -42,7 +42,6 @@ export class App implements OnInit {
   @ViewChild('profileDrawer') profileDrawer!: MatSidenav;
   @ViewChild('profileFileInput', { static: false }) profileFileInput!: ElementRef<HTMLInputElement>;
 
-  protected readonly title = signal('Inventory Manager');
   protected readonly profileService = inject(ProfileService);
   protected readonly profileImage = this.profileService.profileImage;
 
@@ -96,7 +95,7 @@ export class App implements OnInit {
 
   loadProfile() {
     this.profileService.loadProfile().subscribe({
-      next: () => {},
+      next: () => { },
       error: (error) => {
         console.error('Unable to load profile image', error);
       },
@@ -145,7 +144,7 @@ export class App implements OnInit {
 
   removeProfileImage() {
     this.profileService.removeProfileImage().subscribe({
-      next: () => {},
+      next: () => { },
       error: (error) => {
         console.error('Removing profile image failed:', error);
       },
